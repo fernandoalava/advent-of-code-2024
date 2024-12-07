@@ -2,10 +2,23 @@ import scala.io.Source
 
 @main def day7(): Unit = {
 
-  enum Operation:
-    case Add
-    case Mul
-    case Concat
+  sealed trait Operation {
+    def calculate(x: Long, y: Long): Long
+  }
+
+  object Operation {
+    case object Add extends Operation {
+      def calculate(x: Long, y: Long): Long = x + y
+    }
+
+    case object Mul extends Operation {
+      def calculate(x: Long, y: Long): Long = x * y
+    }
+
+    case object Concat extends Operation {
+      def calculate(x: Long, y: Long): Long = s"$x$y".toLong
+    }
+  }
 
   def parseInput(input: Seq[String]): Seq[(Long, Seq[Long])] = {
     input.map(line =>
@@ -47,14 +60,9 @@ import scala.io.Source
     combinations
       .find(combination => {
         (0 until operands.size - 1)
-          .foldLeft(operands(0))((accumulator, index) => {
-            val nextOperand = operands(index + 1)
-            val operand = combination(index)
-            operand match
-              case Operation.Add    => accumulator + nextOperand
-              case Operation.Mul    => accumulator * nextOperand
-              case Operation.Concat => s"$accumulator$nextOperand".toLong
-          }) == target
+          .foldLeft(operands(0))((accumulator, index) =>
+            combination(index).calculate(accumulator, operands(index + 1))
+          ) == target
       })
       .fold(false)(_ => true)
   }
