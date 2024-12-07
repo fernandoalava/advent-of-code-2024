@@ -42,12 +42,11 @@ import scala.io.Source
       supportedOperations: Set[Operation]
   ): Boolean = {
     val slots = operands.length - 1
-    val possibleCombinations = Math.pow(supportedOperations.size, slots).toInt
     val combinations =
       generateCombinations(supportedOperations.toSeq, slots)
     combinations
-      .map(combination => {
-        (0 until operands.length - 1)
+      .find(combination => {
+        (0 until operands.size - 1)
           .foldLeft(operands(0))((accumulator, index) => {
             val nextOperand = operands(index + 1)
             val operand = combination(index)
@@ -57,7 +56,7 @@ import scala.io.Source
               case Operation.Concat => s"$accumulator$nextOperand".toLong
           }) == target
       })
-      .exists(_ == true)
+      .fold(false)(_ => true)
   }
 
   val testInput = """190: 10 19
@@ -78,8 +77,8 @@ import scala.io.Source
       .sum
   }
 
-  /** It should be improve current approach is using brute force and take 6s to
-    * process in my machine
+  /** It should be improve current approach is using brute force and take 4s to
+    * process in my machine, possible improvement seems to be recursion
     */
   def puzzle2(input: Seq[String]): Long = {
     parseInput(input)
@@ -100,7 +99,7 @@ import scala.io.Source
 
   println(puzzle1(testInput.split("\n")))
   println(puzzle2(testInput.split("\n")))
-  
+
   println(puzzle1(getInput()))
   println(Utils.withExecutionTime(puzzle2(getInput())))
 }
