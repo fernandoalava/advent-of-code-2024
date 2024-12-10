@@ -1,5 +1,6 @@
 import scala.io.Source
 import scala.annotation.tailrec
+import scala.collection.immutable.Queue
 
 @main def day9(): Unit = {
 
@@ -13,8 +14,24 @@ import scala.annotation.tailrec
   val testInput = """2333133121414131402"""
 
   sealed trait Block
-  case object Free extends Block
-  case class File(id: Int) extends Block
+  object Block {
+    def isFile(block: Block): Boolean = {
+      block match
+        case Free    => false
+        case File(_) => true
+    }
+    def isFree(block: Block): Boolean = {
+      block match
+        case Free    => true
+        case File(_) => false
+    }
+  }
+  case object Free extends Block {
+    override def toString(): String = "."
+  }
+  case class File(id: Int) extends Block {
+    override def toString(): String = s"${id}"
+  }
 
   def generateLayout(input: String): Vector[Block] = {
     input
@@ -66,6 +83,47 @@ import scala.annotation.tailrec
     }.sum
   }
 
+  def findFreeBlocks(
+      leftMost: Vector[Block],
+      until: Int,
+      size: Int
+  ): Option[Vector[Int]] = {
+    leftMost.zipWithIndex
+      .sliding(size)
+      .find(window => window.map(_._1).forall(Block.isFree))
+      .map(_.map(_._2))
+  }
+
+  @tailrec
+  def fragment(
+      input: Vector[Block],
+      lastFileBlock: File
+  ): Vector[Block] = {
+    if (lastFileBlock.id == 0) {
+      input
+    } else {
+      val files = input.zipWithIndex.filter { a =>
+        a._1 match
+          case File(lastFileBlock.id) => true
+          case _                      => false
+
+      }
+      val nextFileBlock = lastFileBlock.copy(lastFileBlock.id - 1)
+      val leftmost = input.slice(0, files.head._2)
+      val nextInput =
+        findFreeBlocks(leftmost, files.head._2, files.length).fold(input)(
+          freeBlock =>
+            files.zipWithIndex.foldLeft(input)((prevInput, value) => {
+              val (file, index) = value
+              prevInput
+                .updated(freeBlock(index), file._1)
+                .updated(file._2, Free)
+            })
+        )
+      fragment(nextInput, nextFileBlock)
+    }
+  }
+
   def puzzle1(input: String): Long = {
     val layout = generateLayout(input)
     val withOutGaps =
@@ -73,7 +131,14 @@ import scala.annotation.tailrec
     calculateFileSystemCheckSum(withOutGaps)
   }
 
-  println(puzzle1(testInput))
-  println(puzzle1(getInput()))
+  def puzzle2(input: String): Long = {
+    val layout = generateLayout(input)
+    val lastFileBlock = layout.findLast(Block.isFile).get.asInstanceOf[File]
+    val fragmented = fragment(layout, lastFileBlock)
+    calculateFileSystemCheckSum(fragmented)
+  }
+
+  println(puzzle2(testInput))
+  println(puzzle2(getInput()))
 
 }
