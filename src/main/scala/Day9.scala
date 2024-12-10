@@ -7,13 +7,16 @@ import scala.annotation.tailrec
     Source
       .fromFile("src/main/resources/day9/input.txt")
       .getLines()
-      .toList
       .mkString
   }
 
   val testInput = """2333133121414131402"""
 
-  def generateLayout(input: String): Vector[Char] = {
+  sealed trait Block
+  case object Free extends Block
+  case class File(id: Int) extends Block
+
+  def generateLayout(input: String): Vector[Block] = {
     input
       .map(_.asDigit)
       .sliding(2, 2)
@@ -23,40 +26,41 @@ import scala.annotation.tailrec
       }
       .zipWithIndex
       .flatMap {
-        case (Right(file, freeSpace), index) =>
-          s"${index.toString * file}${"." * freeSpace}"
-        case (Left(file), index) => s"${index.toString * file}"
+        case (Right(file, freeSpace), index) => {
+          Seq.fill(file)(new File(index)) ++ Seq.fill(freeSpace)(Free)
+        }
+        case (Left(file), index) => {
+          Seq.fill(file)(new File(index))
+        }
       }
       .toVector
   }
 
   @tailrec
-  def removeGaps(seq: Vector[Char], i: Int, j: Int): Vector[Char] = {
+  def removeGaps(seq: Vector[Block], i: Int, j: Int): Vector[Block] = {
     if (i >= j) seq
     else {
       val next = (seq(i), seq(j)) match
-        case ('.', b) if b.isDigit => {
-          val newSeq = seq.updated(i, b).updated(j, '.')
+        case (File(_), _) => (seq, i + 1, j)
+        case (_, Free)    => (seq, i, j - 1)
+        case (a @ Free, b @ File(_)) => {
+          val newSeq = seq.updated(i, b).updated(j, a)
           (newSeq, i + 1, j - 1)
         }
-        case ('.', '.')          => (seq, i, j - 1)
-        case (a, _) if a.isDigit => (seq, i + 1, j)
-        case (_, '.')            => (seq, i, j - 1)
-        case _ => (seq, i + 1, j - 1)
 
       removeGaps(next._1, next._2, next._3)
     }
   }
 
-  def calculateFileSystemCheckSum(seq: Vector[Char]): Long = {
+  def calculateFileSystemCheckSum(seq: Vector[Block]): Long = {
     seq.zipWithIndex.flatMap {
       case (value, index) => {
         value match
-          case v if v.isDigit => {
-            Some((index * v.asDigit).toLong)
-          }
-          case _ => {
+          case Free => {
             None
+          }
+          case File(id) => {
+            Some((index.toLong * id).toLong)
           }
       }
     }.sum
@@ -69,8 +73,7 @@ import scala.annotation.tailrec
     calculateFileSystemCheckSum(withOutGaps)
   }
 
-  // println(puzzle1(testInput))
-  // println(getInput())
+  println(puzzle1(testInput))
   println(puzzle1(getInput()))
 
 }
