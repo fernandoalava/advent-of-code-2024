@@ -133,7 +133,7 @@ import scala.collection.immutable.Queue
 
   def puzzle2(input: String): Long = {
     val layout = generateLayout(input)
-    val lastFileBlock = layout.findLast(Block.isFile).get.asInstanceOf[File]
+    val lastFileBlock = layout.findLast(Block.isFile).map(_.asInstanceOf[File]).get
     val fragmented = fragment(layout, lastFileBlock)
     calculateFileSystemCheckSum(fragmented)
   }
