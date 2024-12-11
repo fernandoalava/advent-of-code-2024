@@ -1,5 +1,4 @@
 import scala.io.Source
-import scala.collection.View.Iterate
 object Day8 {
 
   sealed trait Element
@@ -131,8 +130,8 @@ object Day8 {
   }
 
   @main def main(): Unit = {
-    println(puzzle1(parseInput(testInput)))
-    println(puzzle2(parseInput(testInput)))
+    println(puzzle1(parseInput(testInput.toIndexedSeq)))
+    println(puzzle2(parseInput(testInput.toIndexedSeq)))
     println(puzzle1(parseInput(getInput())))
     println(puzzle2(parseInput(getInput())))
   }

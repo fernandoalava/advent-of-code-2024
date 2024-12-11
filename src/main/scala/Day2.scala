@@ -23,13 +23,13 @@ import scala.io.Source
 
   def puzzle1: Integer = {
     getInput
-      .map(v => isSafe(v, false))
+      .map(v => isSafe(v.toSeq, false))
       .count(_ == true)
   }
 
   def puzzle2: Integer = {
     getInput
-      .map(v => isSafe(v, true))
+      .map(v => isSafe(v.toSeq, true))
       .count(_ == true)
   }
 

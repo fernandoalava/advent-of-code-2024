@@ -24,7 +24,7 @@ import scala.io.Source
     input.map(line =>
       line.trim.split(":") match
         case Array(target, values) =>
-          (target.toLong, values.trim.split(" ").map(_.toLong))
+          (target.toLong, values.trim.split(" ").map(_.toLong).toIndexedSeq)
     )
   }
 
@@ -105,8 +105,8 @@ import scala.io.Source
       .sum
   }
 
-  println(puzzle1(testInput.split("\n")))
-  println(puzzle2(testInput.split("\n")))
+  println(puzzle1(testInput.split("\n").toIndexedSeq))
+  println(puzzle2(testInput.split("\n").toIndexedSeq))
 
   println(puzzle1(getInput()))
   println(Utils.withExecutionTime(puzzle2(getInput())))

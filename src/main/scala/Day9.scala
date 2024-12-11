@@ -1,6 +1,5 @@
 import scala.io.Source
 import scala.annotation.tailrec
-import scala.collection.immutable.Queue
 
 @main def day9(): Unit = {
 
@@ -133,11 +132,14 @@ import scala.collection.immutable.Queue
 
   def puzzle2(input: String): Long = {
     val layout = generateLayout(input)
-    val lastFileBlock = layout.findLast(Block.isFile).map(_.asInstanceOf[File]).get
+    val lastFileBlock =
+      layout.findLast(Block.isFile).map(_.asInstanceOf[File]).get
     val fragmented = fragment(layout, lastFileBlock)
     calculateFileSystemCheckSum(fragmented)
   }
 
+  println(puzzle1(testInput))
+  println(puzzle2(getInput()))
   println(puzzle2(testInput))
   println(puzzle2(getInput()))
 

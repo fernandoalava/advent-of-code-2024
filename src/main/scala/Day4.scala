@@ -119,8 +119,6 @@ import scala.util.Try
   }
 
   def puzzle1(input: Array[Array[Char]]): Integer = {
-    val rows = input.length
-    val cols = input.head.length
     (for {
       row <- 0 until input.length
       col <- 0 until input.head.length
@@ -132,8 +130,6 @@ import scala.util.Try
   }
 
   def puzzle2(input: Array[Array[Char]]): Integer = {
-    val rows = input.length
-    val cols = input.head.length
     (for {
       row <- 0 until input.length
       col <- 0 until input.head.length

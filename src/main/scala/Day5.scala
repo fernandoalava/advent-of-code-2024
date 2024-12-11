@@ -117,7 +117,7 @@ val testInput = """
 """
 
 @main def day5(): Unit = {
-  val input = parseInput(testInput.split("\n"))
+  val input = parseInput(testInput.split("\n").toIndexedSeq)
   println(puzzle1(input))
   println(puzzle2(input))
   println(puzzle1(getInput()))
