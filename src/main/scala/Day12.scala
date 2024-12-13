@@ -30,6 +30,8 @@ EEEC
   type Mapa = Map[Coordinate, Char]
   case class Coordinate(row: Int, column: Int)
 
+  var visited: mutable.Set[Coordinate] = mutable.Set.empty
+
   def getInput(): Vector[String] = {
     Source
       .fromFile("src/main/resources/day12/input.txt")
