@@ -100,7 +100,7 @@ EEEC
       .toVector
       .map(_.flatten.toSet)
       .filter(_.nonEmpty)
-      .map(_.toVector.map(coordinate => (mapa.get(coordinate).get, coordinate)))
+      .map(_.toVector.flatMap(coordinate => mapa.get(coordinate).fold(None)(plantType => Some((plantType,coordinate)))))
   }
 
   def calculatePrice(region: Vector[(Char, Coordinate)], mapa: Mapa): Int = {
